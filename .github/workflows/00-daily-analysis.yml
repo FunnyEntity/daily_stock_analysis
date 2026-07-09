@@ -43,6 +43,15 @@ jobs:
       
       - name: 检出代码
         uses: actions/checkout@v5
+
+      - name: 同步上游代码
+        run: |
+          upstream="${{ vars.UPSTREAM_REPO }}"
+          if [ -n "$upstream" ]; then
+            git remote add upstream "$upstream" 2>/dev/null || true
+            git fetch upstream main 2>/dev/null || echo "⚠️ 获取上游代码失败，继续使用当前代码"
+            git merge upstream/main --no-edit -X theirs 2>/dev/null || echo "⚠️ 合并上游代码失败，继续使用当前代码"
+          fi
       
       - name: 设置 Python 环境
         uses: actions/setup-python@v6
