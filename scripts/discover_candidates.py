@@ -102,6 +102,7 @@ def main():
         help='输出格式: list(代码列表), env(STOCK_LIST=xxx), both',
     )
     args = parser.parse_args()
+    output_format = args.output
     source = args.source.strip().lower()
     max_stocks = args.max
     markets = args.markets.strip().lower()
@@ -138,6 +139,8 @@ def main():
         logger.info("[发现] 获取涨停池 (最多 %d 只)...", per_source_limit)
         try:
             limit_up = manager.get_limit_up_pool(n=per_source_limit)
+            for item in limit_up:
+                item.setdefault("source", "涨停池")
             logger.info("[发现] 涨停池获取 %d 只", len(limit_up))
             all_candidates.extend(limit_up)
         except Exception as e:
