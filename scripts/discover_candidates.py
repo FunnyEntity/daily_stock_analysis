@@ -55,9 +55,22 @@ logger = logging.getLogger("discover_candidates")
 
 A_SHARE_CODE_RE = re.compile(r"^(000|001|002|003|300|301|600|601|603|605|688)\d{3}$")
 
+_BLACKLIST_NAME_RE = re.compile(r"退市|ST|\*ST|S\*?ST|PT", re.IGNORECASE)
+_BLACKLIST_CODE_RE = re.compile(r"^(000971|300028|300372)")  # 退市/摘牌预留
+
 
 def _is_a_share(code: str) -> bool:
     return bool(A_SHARE_CODE_RE.match(code))
+
+
+def _is_blacklisted(stock: Dict[str, Any]) -> bool:
+    code = str(stock.get("code", "")).strip()
+    name = str(stock.get("name", "")).strip()
+    if _BLACKLIST_CODE_RE.match(code):
+        return True
+    if _BLACKLIST_NAME_RE.search(name):
+        return True
+    return False
 
 
 def _deduplicate_by_code(stocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -151,6 +164,12 @@ def main():
     if "cn" in markets:
         all_candidates = _filter_a_shares(all_candidates)
         logger.info("[发现] 过滤A股后: %d", len(all_candidates))
+
+    before_blacklist = len(all_candidates)
+    all_candidates = [s for s in all_candidates if not _is_blacklisted(s)]
+    removed = before_blacklist - len(all_candidates)
+    if removed > 0:
+        logger.info("[发现] 过滤退市/ST股: 移除 %d 只", removed)
 
     all_candidates = _deduplicate_by_code(all_candidates)
     logger.info("[发现] 去重后: %d", len(all_candidates))
