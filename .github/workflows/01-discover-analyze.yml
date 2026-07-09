@@ -300,7 +300,10 @@ jobs:
           echo "📝 报告类型: $REPORT_TYPE"
           echo "=========================================="
 
-          python main.py --stocks "$STOCK_LIST" --no-market-review $FORCE_RUN_ARG
+          MARKET_REVIEW_FLAG="--no-market-review"
+          case "${MARKET_REVIEW_ENABLED:-true}" in true|1|yes|on) MARKET_REVIEW_FLAG="" ;; esac
+          echo "📈 大盘复盘: $([ -z "$MARKET_REVIEW_FLAG" ] && echo '开启' || echo '关闭')"
+          python main.py --stocks "$STOCK_LIST" $MARKET_REVIEW_FLAG $FORCE_RUN_ARG
 
       - name: 上传分析报告
         uses: actions/upload-artifact@v6
