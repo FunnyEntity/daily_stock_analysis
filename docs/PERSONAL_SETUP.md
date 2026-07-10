@@ -8,7 +8,8 @@
 |------|------|------|
 | `scripts/discover_candidates.py` | **新建** | 候选池自动发现脚本（人气榜+涨停池+退市过滤） |
 | `.github/workflows/01-discover-analyze.yml` | **新建** | 串联发现+分析+大盘复盘工作流 |
-| `.github/workflows/00-daily-analysis.yml` | **修改** | 在 checkout 后插入上游代码同步 step |
+| `.github/workflows/00-daily-analysis.yml` | **修改** | 在 checkout 后插入上游代码同步 step；定时改为仅周五 |
+| `scripts/generate_watchlist.py` | **新建** | 全A股自选名单生成器（拉取~5000只→过滤→抽样500只） |
 | `docs/PERSONAL_SETUP.md` | **新建** | 本文件 |
 
 > 以上文件除 `00-daily-analysis.yml` 外均为上游不存在的文件，上游更新后不会被覆盖。`00-daily-analysis.yml` 若上游也改了相同位置，合并策略 `-X theirs` 会取上游版本，需手动补回。
@@ -26,9 +27,17 @@
 同步上游代码 → 安装依赖 → 发现候选池（人气榜+涨停池）→ 分析 → 大盘复盘 → 上传报告
 ```
 
-### `00-daily-analysis`（每日股票分析）— 备用
+### `00-daily-analysis`（每日股票分析）— 周度全市场扫描
 
-每天 18:00 自动触发，用固定 `STOCK_LIST` 跑分析。
+仅周五 18:00 自动触发，用固定 `STOCK_LIST`（500只自选）做全市场扫描。也可以手动触发。
+
+### 生成自选名单
+
+```bash
+python scripts/generate_watchlist.py --shuffle --max 500
+```
+
+将输出粘贴到 GitHub Variables `STOCK_LIST` 中。
 
 ---
 
