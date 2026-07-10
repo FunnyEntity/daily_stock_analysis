@@ -55,7 +55,7 @@ jobs:
         run: |
           discovered=$(python scripts/discover_candidates.py --output list \
             --source "${DISCOVER_SOURCE:-hot_stocks,limit_up}" \
-            --max "${DISCOVER_MAX_STOCKS:-100}")
+            --max ${{ vars.DISCOVER_MAX_STOCKS || '100' }})
           
           if [ -z "$discovered" ]; then
             echo "⚠️ 未发现候选股，回退到默认 STOCK_LIST"

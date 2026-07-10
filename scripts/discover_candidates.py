@@ -55,7 +55,7 @@ logger = logging.getLogger("discover_candidates")
 
 A_SHARE_CODE_RE = re.compile(r"^(000|001|002|003|300|301|600|601|603|605|688)\d{3}$")
 
-_BLACKLIST_NAME_RE = re.compile(r"退市|ST|\*ST|S\*?ST|PT", re.IGNORECASE)
+_BLACKLIST_NAME_RE = re.compile(r"退|ST|\*ST|S\*?ST|PT", re.IGNORECASE)
 _BLACKLIST_CODE_RE = re.compile(r"^(000971|300028|300372)")  # 退市/摘牌预留
 
 
@@ -143,6 +143,8 @@ def main():
         logger.info("[发现] 获取人气股榜 (最多 %d 只)...", per_source_limit)
         try:
             hot = manager.get_hot_stocks(n=per_source_limit)
+            for item in hot:
+                item.setdefault("source", "人气榜")
             logger.info("[发现] 人气股获取 %d 只", len(hot))
             all_candidates.extend(hot)
         except Exception as e:
